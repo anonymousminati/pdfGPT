@@ -14,7 +14,7 @@ class VectorDB:
         self.embedding_dimension = embedding_dimension
         self.index_file = index_file
         self.data_file = data_file
-        self.model = SentenceTransformer("all-mpnet-base-v2", device='cpu')
+        self.model = SentenceTransformer("all-mpnet-base-v2", device='gpu' if torch.cuda.is_available() else 'cpu')
         self.embeddings = None
         self.text_chunks = None
         self.index = None
