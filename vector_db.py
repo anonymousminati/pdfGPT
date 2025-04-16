@@ -5,8 +5,10 @@ import pickle
 import nltk
 import numpy as np
 
-nltk.download('punkt')
-
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
 class VectorDB:
     def __init__(self, embedding_dimension=768, index_file="vector_db.faiss", data_file="vector_data.pkl"):
         self.embedding_dimension = embedding_dimension
