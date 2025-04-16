@@ -4,6 +4,7 @@ import faiss
 import pickle
 import nltk
 import numpy as np
+import torch
 
 try:
     nltk.data.find('tokenizers/punkt')
