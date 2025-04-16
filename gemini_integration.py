@@ -13,8 +13,8 @@ class GeminiAI:
         for context_chunks in list_of_context_chunks:
             self.add_to_knowledge_base(context_chunks)
 
-    def get_answer(self, question):
-        context = "\n".join(self.knowledge_base)
+    def get_answer(self, question, context_chunks):
+        context = "\n".join(context_chunks)
         prompt = (
            f"""
             You are a helpful assistant designed to answer questions based on the following context:

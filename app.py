@@ -2,7 +2,6 @@ import streamlit as st
 from pdf_processor import extract_text_from_pdf
 from vector_db import VectorDB
 from gemini_integration import GeminiAI
-import torch
 
 # Initialize only once
 if "initialized" not in st.session_state:
@@ -11,8 +10,6 @@ if "initialized" not in st.session_state:
     st.session_state.chat_history = []
     st.session_state.current_question = ""
     st.session_state.initialized = True
-    print("torch.__version__", torch.__version__)
-    print("torch.cuda.is_available()", torch.cuda.is_available())
 
 vector_db = st.session_state.vector_db
 gemini_ai = st.session_state.gemini_ai
@@ -27,8 +24,7 @@ if uploaded_files:
     with st.spinner("Processing PDFs..."):
         for uploaded_file in uploaded_files:
             pdf_text = extract_text_from_pdf(uploaded_file)
-            chunks = [pdf_text[i:i+500] for i in range(0, len(pdf_text), 500)]
-            gemini_ai.add_to_knowledge_base(chunks)
+            vector_db.store_embeddings(pdf_text)
     st.sidebar.success("All PDFs processed and added to the knowledge base!")
 
 # Display chat history
@@ -50,7 +46,11 @@ question = st.text_input("Enter your question:", value=st.session_state.current_
 if st.button("ASK"):
     if question:
         with st.spinner("Finding the answer..."):
-            answer = gemini_ai.get_answer(question)
+            context_chunks = vector_db.query(question)
+            if context_chunks:
+                answer = gemini_ai.get_answer(question, context_chunks)
+            else:
+                answer = "This is beyond my knowledge."
         # Add to chat history
         st.session_state.chat_history.append({"question": question, "answer": answer})
         st.session_state.current_question = ""  # clear input
